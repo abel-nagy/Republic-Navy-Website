@@ -16,22 +16,45 @@
     <div class="video-overlay"></div>
 </div>
 
-<MudButton EndIcon="@Icons.Custom.Brands.Steam" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large" Class="top-right-corner-position">Sign in</MudButton>
+<MudButton EndIcon="@Icons.Custom.Brands.Steam"
+           Variant="Variant.Outlined"
+           Color="Color.Primary"
+           Size="Size.Large"
+           Class="top-right-corner-position">
+    Sign in
+</MudButton>
 
 <div id="content">
     <MudMainContent>
-        <MudText Color="Color.Success" Typo="Typo.h4">Welcome to the Republic Navy!</MudText>
+        <MudText Color="Color.Success"
+                 Typo="Typo.h4">
+            Welcome to the Republic Navy!
+        </MudText>
 
-        <MudDivider Class="my-8" DividerType="DividerType.Middle"/>
+        <MudDivider Class="my-8" 
+                    DividerType="DividerType.Middle"/>
 
-        <MudAlert Severity="Severity.Info" NoIcon="true" Dense="true" ContentAlignment="HorizontalAlignment.Center">
-            <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="4">
-                <MudText Align="Align.Center">Learn more about</MudText>
+        <MudAlert Severity="Severity.Info"
+                  NoIcon="true"
+                  Dense="true"
+                  ContentAlignment="HorizontalAlignment.Center">
 
-                <MudLink Href="https://superiorservers.co/" Target="_blank">
-                    <MudImage Height="50" Src="https://superiorservers.co/static/images/site-logo_reduced.png"></MudImage>
+            <MudStack Row="true"
+                      AlignItems="AlignItems.Center"
+                      Spacing="4">
+
+                <MudText Align="Align.Center">
+                    Learn more about
+                </MudText>
+
+                <MudLink Href="https://superiorservers.co/"
+                         Target="_blank">
+                    <MudImage Height="50"
+                              Src="https://superiorservers.co/static/images/site-logo_reduced.png"/>
                 </MudLink>
             </MudStack>
+
         </MudAlert>
+
     </MudMainContent>
 </div>
