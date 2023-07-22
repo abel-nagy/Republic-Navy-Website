@@ -1,0 +1,41 @@
+﻿body { overflow-x: hidden; }
+
+.video-container {
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    width: 100vw;
+}
+
+.video-container video {
+    height: 100%;
+    left: 0;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    width: 100%;
+}
+
+.video-container .video-overlay {
+    background-color: #000000;
+    background-color: rgba(0, 0, 0, 0.8); /* change the last value to adjust the darkness */
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.top-right-corner-position {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    z-index: 2;
+}
+
+#content {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
