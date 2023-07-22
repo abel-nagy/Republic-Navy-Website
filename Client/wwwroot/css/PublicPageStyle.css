@@ -7,18 +7,16 @@
     width: 100vw;
 }
 
-iframe {
-    height: 100vh;
-    left: 50%;
-    overflow: hidden;
-    pointer-events: none;
+.video-container video {
+    height: 100%;
+    left: 0;
+    object-fit: cover;
     position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 100vw;
+    top: 0;
+    width: 100%;
 }
 
-.video-overlay {
+.video-container .video-overlay {
     background-color: #000000;
     background-color: rgba(0, 0, 0, 0.8); /* change the last value to adjust the darkness */
     bottom: 0;
@@ -30,8 +28,8 @@ iframe {
 
 .top-right-corner-position {
     position: absolute;
-    top: 15px;
     right: 15px;
+    top: 15px;
     z-index: 2;
 }
 
@@ -40,18 +38,4 @@ iframe {
     position: absolute;
     top: 50%;
     transform: translate(-50%, -50%);
-}
-
-@media (min-aspect-ratio: 16/9) {
-    .video-container iframe {
-        /* height = 100 * (9 / 16) = 56.25 */
-        height: 56.25vw;
-    }
-}
-
-@media (max-aspect-ratio: 16/9) {
-    .video-container iframe {
-        /* width = 100 / (9 / 16) = 177.777777 */
-        width: 177.78vh;
-    }
 }
