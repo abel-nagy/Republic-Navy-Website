@@ -1,0 +1,57 @@
+﻿body { overflow-x: hidden; }
+
+.video-container {
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    width: 100vw;
+}
+
+iframe {
+    height: 100vh;
+    left: 50%;
+    overflow: hidden;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 100vw;
+}
+
+.video-overlay {
+    background-color: #000000;
+    background-color: rgba(0, 0, 0, 0.8); /* change the last value to adjust the darkness */
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.top-right-corner-position {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 2;
+}
+
+#content {
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@media (min-aspect-ratio: 16/9) {
+    .video-container iframe {
+        /* height = 100 * (9 / 16) = 56.25 */
+        height: 56.25vw;
+    }
+}
+
+@media (max-aspect-ratio: 16/9) {
+    .video-container iframe {
+        /* width = 100 / (9 / 16) = 177.777777 */
+        width: 177.78vh;
+    }
+}
