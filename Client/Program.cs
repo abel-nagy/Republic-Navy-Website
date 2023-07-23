@@ -16,10 +16,19 @@ public class Program
         builder.Services.AddMudServices();
         try
         {
-            builder.Services.AddSingleton(new HttpClient
+            var baseUri = string.Empty;
+
+            if (builder.HostEnvironment.IsProduction())
             {
-                BaseAddress = new Uri(builder.Configuration["Api:BaseUrl"])
-            });
+                baseUri = builder.HostEnvironment.BaseAddress;
+            } 
+            else if (builder.HostEnvironment.IsDevelopment())
+            {
+                baseUri = builder.Configuration["Api:BaseUrl"];
+            }
+
+            Console.WriteLine($"BaseURI: {baseUri}");
+            builder.Services.AddSingleton(new HttpClient { BaseAddress = new Uri(baseUri) });
         }
         catch (Exception e)
         {

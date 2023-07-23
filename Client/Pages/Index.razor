@@ -69,7 +69,7 @@
         try
         {
             var name = "sens1tiv";
-            var response = await HttpClient.GetAsync($"NameGet?name={name}");
+            var response = await HttpClient.GetAsync($"/api/NameGet?name={name}");
             _name = response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : "Guest";
         } 
         catch (Exception e)
