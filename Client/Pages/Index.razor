@@ -1,5 +1,6 @@
 ﻿@page "/"
 @layout EmptyLayout
+@inject HttpClient HttpClient
 
 <PageTitle>Home - Republic Navy</PageTitle>
 
@@ -28,7 +29,7 @@
     <MudMainContent>
         <MudText Color="Color.Success"
                  Typo="Typo.h4">
-            Welcome to the Republic Navy!
+            Welcome to the Republic Navy, @_name!
         </MudText>
 
         <MudDivider Class="my-8" 
@@ -58,3 +59,22 @@
 
     </MudMainContent>
 </div>
+
+@code
+{
+    private string _name = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var name = "sens1tiv";
+            var response = await HttpClient.GetAsync($"NameGet?name={name}");
+            _name = response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : "Guest";
+        } 
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+}
