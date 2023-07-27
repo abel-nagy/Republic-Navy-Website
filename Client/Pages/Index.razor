@@ -1,6 +1,9 @@
 ﻿@page "/"
+@using Client.Authentication
 @layout EmptyLayout
-@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject AuthenticationService AuthenticationService
+@inject AuthenticatedHttpClient NavyApiClient
 
 <PageTitle>Home - Republic Navy</PageTitle>
 
@@ -21,7 +24,8 @@
            Variant="Variant.Outlined"
            Color="Color.Primary"
            Size="Size.Large"
-           Class="top-right-corner-position">
+           Class="top-right-corner-position"
+           OnClick="LoginWithSteam">
     Sign in
 </MudButton>
 
@@ -29,7 +33,7 @@
     <MudMainContent>
         <MudText Color="Color.Success"
                  Typo="Typo.h4">
-            Welcome to the Republic Navy, @_name!
+            Welcome to the Republic Navy!
         </MudText>
 
         <MudDivider Class="my-8" 
@@ -62,19 +66,27 @@
 
 @code
 {
-    private string _name = string.Empty;
-
     protected override async Task OnInitializedAsync()
+    {
+        var isSavedTokenPresent = await AuthenticationService.IsTokenPresentOnStorage();
+        if (isSavedTokenPresent)
+        {
+            NavigationManager.NavigateTo(WebpagePaths.Dashboard);
+        }
+    }
+
+    private async Task LoginWithSteam()
     {
         try
         {
-            var name = "sens1tiv";
-            var response = await HttpClient.GetAsync($"/api/NameGet?name={name}");
-            _name = response.IsSuccessStatusCode ? await response.Content.ReadAsStringAsync() : "Guest";
-        } 
-        catch (Exception e)
+            var response = await NavyApiClient.SendAuthorizedRequestAsync(HttpMethod.Get, ApiPaths.GetSteamLoginUrl, false);
+            var loginUrl = await response.Content.ReadAsStringAsync();
+            NavigationManager.NavigateTo(loginUrl, forceLoad: true);
+        }
+        catch(Exception e)
         {
             Console.WriteLine(e.Message);
         }
     }
+    
 }

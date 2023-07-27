@@ -1,6 +1,7 @@
+using Blazored.LocalStorage;
+using Client.Authentication;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-
 using MudBlazor.Services;
 
 namespace Client;
@@ -12,28 +13,32 @@ public class Program
         var builder = WebAssemblyHostBuilder.CreateDefault(args);
         builder.RootComponents.Add<App>("#app");
         builder.RootComponents.Add<HeadOutlet>("head::after");
-        
-        builder.Services.AddMudServices();
-        try
-        {
-            var baseUri = string.Empty;
 
-            if (builder.HostEnvironment.IsProduction())
+        builder.Services.AddMudServices();
+        builder.Services.AddBlazoredLocalStorage();
+
+        builder.Services.AddScoped<AuthenticationService>();
+
+        builder.Services.AddScoped(sp =>
+        {
+            var baseUri = builder.HostEnvironment.BaseAddress;
+            var localStorage = sp.GetRequiredService<ILocalStorageService>();
+
+            if (builder.HostEnvironment.IsDevelopment())
             {
-                baseUri = builder.HostEnvironment.BaseAddress;
-            } 
-            else if (builder.HostEnvironment.IsDevelopment())
-            {
-                baseUri = builder.Configuration["Api:BaseUrl"];
+                if (builder.Configuration["Api:BaseUrl"] != null)
+                {
+                    baseUri = builder.Configuration["Api:BaseUrl"] ?? string.Empty;
+                }
             }
 
-            Console.WriteLine($"BaseURI: {baseUri}");
-            builder.Services.AddSingleton(new HttpClient { BaseAddress = new Uri(baseUri) });
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-        }
+            var client = new AuthenticatedHttpClient(localStorage)
+            {
+                BaseAddress = new Uri(baseUri)
+            };
+
+            return client;
+        });
 
         await builder.Build().RunAsync();
     }
