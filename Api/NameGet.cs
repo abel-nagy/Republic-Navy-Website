@@ -28,17 +28,7 @@ public static class NameGet
         var responseMessage = string.IsNullOrEmpty(name)
             ? "Guest"
             : name;
-
-        var result = new OkObjectResult(responseMessage);
-        if (!req.HttpContext.Request.Headers.ContainsKey("Origin"))
-        {
-            return result;
-        }
-
-        req.HttpContext.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
-        req.HttpContext.Response.Headers.Add("Access-Control-Allow-Origin", req.Headers["Origin"].ToString());
-        req.HttpContext.Response.Headers.Add("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-
-        return result;
+        
+        return new OkObjectResult(responseMessage);
     }
 }
