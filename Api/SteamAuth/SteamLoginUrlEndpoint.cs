@@ -10,21 +10,17 @@ namespace Api.SteamAuth;
 
 public static class SteamLoginUrlEndpoint
 {
-    private const string WebsiteHostNameKey = "BASE_URL";
-
     [FunctionName("SteamLoginUrl")]
     public static IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "auth/steam/get-login-url")]
         HttpRequest request)
     {
-        var domain = Environment.GetEnvironmentVariable(WebsiteHostNameKey);
-
         var loginUrlParams = new Dictionary<string, string>
         {
             { "openid.ns", "http://specs.openid.net/auth/2.0" },
             { "openid.mode", "checkid_setup" },
-            { "openid.return_to", $"{domain}/api/auth/steam/callback" },
-            { "openid.realm", $"{domain}/" },
+            { "openid.return_to", $"{SteamAuthConstants.ApiBaseUrl}/api/auth/steam/callback" },
+            { "openid.realm", $"{SteamAuthConstants.ApiBaseUrl}/" },
             { "openid.identity", "http://specs.openid.net/auth/2.0/identifier_select" },
             { "openid.claimed_id", "http://specs.openid.net/auth/2.0/identifier_select" }
         };
