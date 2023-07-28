@@ -10,11 +10,11 @@ namespace Api;
 public static class GetSteamId
 {
     [FunctionName("GetSteamId")]
-    public static Task<IActionResult> Run(
+    public static async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "steamId")]
         HttpRequest request)
     {
-        var userValidity = UserTokenValidator.ValidateToken(request);
-        return userValidity.IsLoginValid ? Task.FromResult<IActionResult>(new OkObjectResult(userValidity.SteamId)) : Task.FromResult<IActionResult>(new UnauthorizedResult());
+        var userValidity = await Task.Run(() => UserTokenValidator.ValidateToken(request));
+        return new OkObjectResult(userValidity.SteamId);
     }
 }
