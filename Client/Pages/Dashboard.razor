@@ -20,7 +20,7 @@
         var isSavedTokenPresent = await AuthenticationService.IsTokenPresentOnStorage();
         if (!isSavedTokenPresent)
         {
-            NavigationManager.NavigateTo(WebpagePaths.Home);
+            //NavigationManager.NavigateTo(WebpagePaths.Home);
         }
 
         var response = await NavyApiClient.SendAuthorizedRequestAsync(HttpMethod.Get, ApiPaths.GetSteamId);
