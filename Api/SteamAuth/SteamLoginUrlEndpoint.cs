@@ -10,14 +10,14 @@ namespace Api.SteamAuth;
 
 public static class SteamLoginUrlEndpoint
 {
-    private const string WebsiteHostNameKey = "WEBSITE_HOSTNAME";
+    private const string WebsiteHostNameKey = "BASE_URL";
 
     [FunctionName("SteamLoginUrl")]
     public static IActionResult Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "auth/steam/get-login-url")]
         HttpRequest request)
     {
-        var domain = GetCorrectUrl();
+        var domain = Environment.GetEnvironmentVariable(WebsiteHostNameKey);
 
         var loginUrlParams = new Dictionary<string, string>
         {
@@ -34,11 +34,5 @@ public static class SteamLoginUrlEndpoint
         var steamLoginUrl = "https://steamcommunity.com/openid/login?" + queryString;
 
         return new OkObjectResult(steamLoginUrl);
-    }
-
-    private static string GetCorrectUrl()
-    {
-        var url = Environment.GetEnvironmentVariable(WebsiteHostNameKey);
-        return url != null && url.Contains("localhost") ? $"http://{url}" : $"https://{url}";
     }
 }
