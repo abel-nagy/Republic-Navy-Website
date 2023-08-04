@@ -52,7 +52,7 @@ internal static class UserTokenValidator
 
         var validationParameters = new TokenValidationParameters
         {
-            ValidateIssuerSigningKey = true,
+            ValidateIssuerSigningKey = false,
             IssuerSigningKey = new RsaSecurityKey(publicKey),
             ValidateIssuer = false,
             ValidateAudience = false
