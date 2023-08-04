@@ -16,16 +16,15 @@ public class AuthenticatedHttpClient : HttpClient
 
     public async Task<HttpResponseMessage> SendAuthorizedRequestAsync(HttpMethod method, string url, bool requireAuthorization = true)
     {
-        var request = await CreateAuthorizedRequest(method, url);
-        return await SendAsync(request, requireAuthorization);
+        var token = await _localStorage.GetItemAsStringAsync(AuthenticationConstants.TokenKey);
+        var request = CreateAuthorizedRequest(method, url, token);
+        return await SendAsync(request, requireAuthorization, token);
     }
 
-    private async Task<HttpRequestMessage> CreateAuthorizedRequest(HttpMethod method, string url)
+    private HttpRequestMessage CreateAuthorizedRequest(HttpMethod method, string url, string token)
     {
         var message = new HttpRequestMessage(method, url);
-
-        var token = await _localStorage.GetItemAsStringAsync(AuthenticationConstants.TokenKey);
-
+        
         if (!string.IsNullOrEmpty(token))
         {
             message.Headers.Authorization = new AuthenticationHeaderValue(AuthenticationConstants.SchemeName, token);
@@ -34,10 +33,8 @@ public class AuthenticatedHttpClient : HttpClient
         return message;
     }
 
-    private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, bool requireAuthorization)
+    private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, bool requireAuthorization, string token)
     {
-        var token = await _localStorage.GetItemAsStringAsync(AuthenticationConstants.TokenKey);
-
         switch (requireAuthorization)
         {
             case true when string.IsNullOrEmpty(token):
@@ -47,13 +44,21 @@ public class AuthenticatedHttpClient : HttpClient
         }
 
         var handler = new JwtSecurityTokenHandler();
-        var jwt = handler.ReadJwtToken(token);
-
-        if (jwt == null || jwt.ValidTo <= DateTime.UtcNow)
+        try
         {
+            var jwt = handler.ReadJwtToken(token);
+
+            //if (jwt == null || jwt.ValidTo <= DateTime.UtcNow)
+            //{
+            //    return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            //}
+
+            return await SendAsync(request);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
             return new HttpResponseMessage(HttpStatusCode.Unauthorized);
         }
-
-        return await SendAsync(request);
     }
 }
