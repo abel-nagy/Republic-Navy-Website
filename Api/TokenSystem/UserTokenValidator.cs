@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Api.SteamAuth;
+using Jose;
 using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 
@@ -29,21 +30,33 @@ internal static class UserTokenValidator
             return new ValidatedSteamLoginData($"token({token}) is expired (token: {jwtToken.ValidTo}, now: {DateTime.UtcNow})", false);
         }
 
-        var publicKeyPem = TokenSystemConstants.RsaPublicKey;
-        var publicKey = RsaHelper.ConvertFromPemToRsa(publicKeyPem);
-        if (publicKey == null)
+        try
         {
-            return new ValidatedSteamLoginData("public key is null", false);
+            // This will throw if the signature is invalid
+            var rsa = TokenSystemConstants.GetRsaPublicKey();
+            var asd = JWT.Decode(token, rsa, JwsAlgorithm.RS256);
+            return new ValidatedSteamLoginData(asd, true);
+        }
+        catch (Exception ex)
+        {
+            return new ValidatedSteamLoginData($"token({token}) is invalid: {ex.Message}", false);
         }
 
-        var validatedTokenObject = ValidateToken(token, publicKey, out message);
-        if (validatedTokenObject == null)
-        {
-            return new ValidatedSteamLoginData($"{message}", false);
-        }
+        //var publicKeyPem = TokenSystemConstants.RsaPublicKey;
+        //var publicKey = RsaHelper.ConvertFromPemToRsa(publicKeyPem);
+        //if (publicKey == null)
+        //{
+        //    return new ValidatedSteamLoginData("public key is null", false);
+        //}
 
-        var steamId = validatedTokenObject.Claims.FirstOrDefault(claim => claim.Type == "steamId")?.Value;
-        return new ValidatedSteamLoginData(steamId, !string.IsNullOrWhiteSpace(steamId));
+        //var validatedTokenObject = ValidateToken(token, publicKey, out message);
+        //if (validatedTokenObject == null)
+        //{
+        //    return new ValidatedSteamLoginData($"{message}", false);
+        //}
+
+        //var steamId = validatedTokenObject.Claims.FirstOrDefault(claim => claim.Type == "steamId")?.Value;
+        //return new ValidatedSteamLoginData(steamId, !string.IsNullOrWhiteSpace(steamId));
     }
 
     private static ClaimsPrincipal ValidateToken(string token, RSA publicKey, out string message)
