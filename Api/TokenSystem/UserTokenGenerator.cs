@@ -1,40 +1,39 @@
 ﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using Api.SteamAuth;
+using System.Text;
+using System.Text.Json;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Api.TokenSystem;
 
 internal static class UserTokenGenerator
 {
-    public static string GenerateUserToken(string steamId)
+    public static string GenerateSignedToken(string steamId)
     {
-        var privateKeyPem = TokenSystemConstants.RsaPrivateKey;
-        var privateKey = RsaHelper.ConvertFromPemToRsa(privateKeyPem);
-        
-        var token = GenerateToken(steamId, privateKey);
-        return token;
-    }
+        var date = new DateTimeOffset(DateTime.UtcNow);
+        var inSeconds = date.ToUnixTimeSeconds();
 
-    public static string GenerateToken(string steamId, RSA privateKey)
-    {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var rsaSecurityKey = new RsaSecurityKey(privateKey) { KeyId = TokenSystemConstants.TokenIssuer };
-
-        var tokenDescriptor = new SecurityTokenDescriptor
+        var headerText = JsonSerializer.Serialize(new { alg = "RS256", typ = "JWT" });
+        var payloadText = JsonSerializer.Serialize(new
         {
-            Subject = new ClaimsIdentity(new[] { new Claim(SteamAuthConstants.SteamIdTokenKey, steamId) }),
-            Expires = DateTime.UtcNow.Add(TokenSystemConstants.GetTokenExpirationTimeSpan()),
-            IssuedAt = DateTime.UtcNow,
-            Issuer = TokenSystemConstants.TokenIssuer,
-            SigningCredentials = new SigningCredentials(rsaSecurityKey, SecurityAlgorithms.RsaSha256)
-        };
+            nbf = inSeconds,
+            exp = inSeconds + TokenSystemConstants.GetTokenExpirationTimeSeconds(),
+            iat = inSeconds,
+            steamId = $"{steamId}"
+        });
 
-        var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-        var token = tokenHandler.WriteToken(securityToken);
+        var convertedHeader = Base64UrlEncoder.Encode(headerText);
+        var convertedPayload = Base64UrlEncoder.Encode(payloadText);
 
-        return token;
+        var manualJwt = $"{convertedHeader}.{convertedPayload}";
+
+        var data = Encoding.UTF8.GetBytes(manualJwt);
+        var signature = RsaHelper.SignData(data);
+        var base64Signature = Base64UrlEncoder.Encode(signature);
+
+        var jwt = $"{convertedHeader}.{convertedPayload}.{base64Signature}";
+
+        var verified = RsaHelper.VerifyData(data, signature);
+
+        return verified ? jwt : string.Empty;
     }
 }

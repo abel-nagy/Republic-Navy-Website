@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 
 namespace Api.TokenSystem;
 
@@ -10,11 +11,28 @@ internal class TokenSystemConstants
     public static string RsaPrivateKey = Environment.GetEnvironmentVariable("RSA_PRIVATE_KEY")?.Replace("\\n", "\n");
     public static string RsaPublicKey = Environment.GetEnvironmentVariable("RSA_PUBLIC_KEY")?.Replace("\\n", "\n");
 
-    public static TimeSpan GetTokenExpirationTimeSpan()
+    public static RSA GetRsaPrivateKey()
     {
-        return TimeSpan.FromMinutes(
-            int.TryParse(Environment.GetEnvironmentVariable("TOKEN_VALIDITY_IN_MINUTES"), out var minutes)
-                ? minutes
-                : 1);
+        var privateKeyPem = RsaPrivateKey;
+        var privateKeyRsa = RsaHelper.ConvertFromPemToRsa(privateKeyPem);
+        return privateKeyRsa;
+    }
+
+    public static RSA GetRsaPublicKey()
+    {
+        var publicKeyPem = RsaPublicKey;
+        var publicKeyRsa = RsaHelper.ConvertFromPemToRsa(publicKeyPem);
+        return publicKeyRsa;
+    }
+
+    public static long GetTokenExpirationTimeSeconds()
+    {
+        var asd = Environment.GetEnvironmentVariable("TOKEN_VALIDITY_IN_MINUTES");
+        if (asd != null)
+        {
+            return long.TryParse(asd, out var seconds) ? seconds * 60 : 60;
+        }
+
+        return 60;
     }
 }

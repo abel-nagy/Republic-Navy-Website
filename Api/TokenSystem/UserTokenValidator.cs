@@ -52,11 +52,9 @@ internal static class UserTokenValidator
 
         var validationParameters = new TokenValidationParameters
         {
-            ValidateIssuerSigningKey = true,
             IssuerSigningKey = new RsaSecurityKey(publicKey) { KeyId = TokenSystemConstants.TokenIssuer },
-            ValidateIssuer = true,
-            ValidateAudience = false,
-            ValidIssuer = TokenSystemConstants.TokenIssuer
+            ValidateIssuer = false,
+            ValidateAudience = false
         };
 
         try

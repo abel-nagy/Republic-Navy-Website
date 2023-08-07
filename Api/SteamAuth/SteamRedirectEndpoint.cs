@@ -22,7 +22,7 @@ public static class SteamRedirectEndpoint
             return new RedirectResult($"{SteamAuthConstants.SiteBaseUrl}/steam-login-redirect");
         }
 
-        var jwt = UserTokenGenerator.GenerateUserToken(steamLoginValidity.SteamId);
+        var jwt = UserTokenGenerator.GenerateSignedToken(steamLoginValidity.SteamId);
         return new RedirectResult($"{SteamAuthConstants.SiteBaseUrl}/steam-login-redirect?authToken={jwt}");
     }
 }
