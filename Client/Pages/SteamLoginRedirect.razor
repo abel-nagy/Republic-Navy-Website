@@ -1,0 +1,14 @@
+﻿@page "/steam-login-redirect"
+@using Client.Authentication
+@inject NavigationManager NavigationManager
+@inject AuthenticationService AuthenticationService
+
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isSavedTokenPresent = await AuthenticationService.SaveTokenAfterSteamLoginRedirectAsync();
+        NavigationManager.NavigateTo(isSavedTokenPresent ? WebpagePaths.Dashboard : WebpagePaths.Home);
+    }
+
+}

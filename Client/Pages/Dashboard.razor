@@ -1,0 +1,43 @@
+﻿@page "/dashboard"
+@using Client.Authentication
+@inject AuthenticationService AuthenticationService
+@inject NavigationManager NavigationManager
+@inject AuthenticatedHttpClient NavyApiClient
+
+<p>Your SteamId: @_steamId</p>
+
+<MudButton OnClick="Logout"
+           Color="Color.Error"
+           Variant="Variant.Filled">
+    Logout
+</MudButton>
+
+@code {
+    private string _steamId = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isSavedTokenPresent = await AuthenticationService.IsTokenPresentOnStorage();
+        if (!isSavedTokenPresent)
+        {
+            //NavigationManager.NavigateTo(WebpagePaths.Home);
+        }
+
+        var response = await NavyApiClient.SendAuthorizedRequestAsync(HttpMethod.Get, ApiPaths.GetSteamId);
+        if (response.IsSuccessStatusCode)
+        {
+            _steamId = await response.Content.ReadAsStringAsync();
+        }
+        else
+        {
+            //await Logout();
+        }
+    }
+
+    public async Task Logout()
+    {
+        await AuthenticationService.DestroyAuthToken();
+        NavigationManager.NavigateTo(WebpagePaths.Home);
+    }
+
+}
